@@ -1,0 +1,8 @@
+{
+  "ref": "content",
+  "name": "Content",
+  "visiblePerms": [
+    "{groupId}.content.write",
+    "{groupId}.group.update"
+  ]
+}
