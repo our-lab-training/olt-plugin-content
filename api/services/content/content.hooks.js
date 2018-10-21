@@ -1,6 +1,6 @@
 
 
-const safeRemove = require('../../hooks/safe-remove');
+const safeRemove = require('../../../../../hooks/safe-remove');
 
 module.exports = {
   before: {

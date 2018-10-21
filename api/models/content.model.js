@@ -1,8 +1,8 @@
 // content-model.js - A mongoose model
 
-const DefaultSchema = require('../types/default.schema');
-const nameType = require('../types/name.type');
-const ObjectIdType = require('../types/objectId.type');
+const DefaultSchema = require('../../../../types/default.schema');
+const nameType = require('../../../../types/name.type');
+const ObjectIdType = require('../../../../types/objectId.type');
 
 module.exports = function (app) {
   
