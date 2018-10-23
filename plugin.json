@@ -1,8 +1,17 @@
 {
   "ref": "content",
   "name": "Content",
-  "visiblePerms": [
-    "{groupId}.content.write",
-    "{groupId}.group.update"
-  ]
+  "settingsLink": "/{groupId}/content/settings",
+  "entries": {
+    "content": {
+      "name": "Content",
+      "component": "frontend/placehold",
+      "icon": "folder",
+      "link": "/{groupId}/content",
+      "visiblePerms": [
+        "{groupId}.content.write",
+        "{groupId}.group.update"
+      ]
+    }
+  }
 }
