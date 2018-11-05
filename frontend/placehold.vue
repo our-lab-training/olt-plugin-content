@@ -1,5 +1,5 @@
 <template>
-  <span>Content Placeholder for {{current.name}}</span>
+  <span>Content Placeholder for {{currentGroup ? currentGroup.name : 'Group Not Found'}}</span>
 </template>
 
 <script>
@@ -7,17 +7,10 @@ import { mapGetters } from 'vuex';
 
 export default {
   data() {
-    return {
-      current: this.currentGroup || {},
-    };
+    return {};
   },
   computed: {
     ...mapGetters('groups', { currentGroup: 'current' }),
-  },
-  watch: {
-    currentGroup() {
-      this.current = this.currentGroup || {};
-    },
   },
 };
 </script>
