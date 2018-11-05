@@ -1,3 +1,21 @@
-import plugin from '../plugin.json';
+import placehold from './placehold.vue';
 
-export default plugin;
+export default {
+  ref: 'content',
+  name: 'Content',
+  settingsLink: '/group/{groupId}/content/settings',
+  routes: {
+    content: {
+      name: 'Content',
+      entry: true,
+      component: placehold,
+      path: '/group/{groupId}/content',
+      icon: 'folder',
+      visiblePerms: [
+        '{groupId}.content.write',
+        '{groupId}.group.update',
+      ],
+    },
+  },
+  store: { content: {} },
+};
