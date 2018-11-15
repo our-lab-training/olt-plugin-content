@@ -8,7 +8,7 @@ module.exports = function (app) {
   const mongooseClient = app.get('mongooseClient');
   const content = DefaultSchema(app);
   content.add({
-    key: {
+    name: {
       type: String,
       match: [/^[a-zA-Z0-9/-_.~]+$/, 'Invalid charaters used in filename.'],
       required: [true, 'A file name is required'],
