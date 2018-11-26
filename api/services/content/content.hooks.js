@@ -13,7 +13,7 @@ module.exports = {
     create: [
       iff(isProvider('external'), discard('md5')),
       alterItems(setenv),
-  ame  ]n,
+    ],
     update: [
       validateMd5(),
       iff(isProvider('external'), discard('groupId')),
