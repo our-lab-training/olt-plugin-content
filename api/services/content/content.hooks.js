@@ -1,6 +1,7 @@
 const { alterItems, iff, isProvider, discard } = require('feathers-hooks-common');
 const validateMd5 = require('../../hooks/validate-md5');
 const presignedUrl = require('../../hooks/presigned-url');
+const checkCopy = require('../../hooks/check-copy');
 const safeRemove = require('../../../../../hooks/safe-remove');
 
 const setenv = rec => {rec.bucket = process.env.AWS_BUCKET_PRIVATE; rec.region = process.env.AWS_REGION;};
@@ -34,7 +35,7 @@ module.exports = {
     ],
     find: [],
     get: [presignedUrl()],
-    create: [presignedUrl()],
+    create: [presignedUrl(), checkCopy()],
     update: [presignedUrl()],
     patch: [presignedUrl()],
     remove: []
