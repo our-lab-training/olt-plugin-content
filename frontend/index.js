@@ -1,4 +1,5 @@
 import placehold from './placehold.vue';
+import './content';
 
 export default {
   ref: 'content',
