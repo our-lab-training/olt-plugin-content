@@ -11,6 +11,9 @@ module.exports = function (options = {}) {
       const { method, app, result, data } = context;
       const {key} = result;
 
+      // ignore directories
+      if(result.type === 'text/x-directory') return context;
+
       // depending on the method, get a diff type of presigned
       if (method === 'get') { // read
         app.buckets.private.getSignedUrl('getObject', { Key: key, Expires: expiry }, (err, url) => {

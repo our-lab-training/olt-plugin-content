@@ -2,14 +2,16 @@
 const createService = require('feathers-mongoose');
 const createModel = require('../../models/content.model');
 const hooks = require('./content.hooks');
+const groupCreate = require('./content.groupCreate');
 
 module.exports = function (app) {
+  groupCreate(app);
   const Model = createModel(app);
-  const paginate = app.get('paginate');
+  // const paginate = app.get('paginate');
 
   const options = {
     Model,
-    paginate
+    // paginate
   };
 
   // Initialize our service with any options it requires

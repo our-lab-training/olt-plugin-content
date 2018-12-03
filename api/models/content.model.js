@@ -10,6 +10,7 @@ module.exports = function (app) {
   content.add({
     name: {
       type: String,
+      unique: true,
       match: [/^[a-zA-Z0-9/-_.~]+$/, 'Invalid charaters used in filename.'],
       required: [true, 'A file name is required'],
     },
@@ -40,6 +41,7 @@ module.exports = function (app) {
         'text/markdown',
         'text/uri-list',
         'text/x-comment',
+        'text/x-directory',
         'text/csv',
         'image/png',
         'image/jpeg',
