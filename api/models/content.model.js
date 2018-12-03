@@ -2,6 +2,7 @@
 
 const DefaultSchema = require('../../../../types/default.schema');
 const ObjectIdType = require('../../../../types/objectId.type');
+const supportedFiles = require('../../supportedFiles');
 
 module.exports = function (app) {
   
@@ -36,35 +37,8 @@ module.exports = function (app) {
     type: {
       type: String,
       required: [true, 'A file type is required'],
-      enum: [
-        'text/plain',
-        'text/markdown',
-        'text/uri-list',
-        'text/x-comment',
-        'text/x-directory',
-        'text/csv',
-        'image/png',
-        'image/jpeg',
-        'image/gif',
-        'image/svg+xml',
-        'video/mp4',
-        'video/x-flv',
-        'audio/mpeg',
-        'audio/x-wav',
-        'application/x-latex',
-        'application/zip',
-        'application/x-javascript',
-        'application/json',
-        'application/x-gzip',
-        'application/pdf',
-        'application/msword',
-        'application/vnd.ms-excel',
-        'application/vnd.ms-powerpoint',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      ],
-    }
+      enum: Object.keys(supportedFiles),
+    },
   });
 
   return mongooseClient.model('content', content);
