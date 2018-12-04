@@ -30,10 +30,6 @@ module.exports = function (app) {
       required: true,
       default: process.env.AWS_REGION,
     },
-    md5: {
-      type: String,
-      match: [/^[0-9abcdef]{32}$/, 'Invalid md5 provided.'],
-    },
     type: {
       type: String,
       required: [true, 'A file type is required'],

@@ -1,5 +1,4 @@
 const { alterItems, iff, isProvider, discard } = require('feathers-hooks-common');
-const validateMd5 = require('../../hooks/validate-md5');
 const presignedUrl = require('../../hooks/presigned-url');
 const checkCopy = require('../../hooks/check-copy');
 const safeRemove = require('../../../../../hooks/safe-remove');
@@ -16,12 +15,10 @@ module.exports = {
       alterItems(setenv),
     ],
     update: [
-      validateMd5(),
       iff(isProvider('external'), discard('groupId')),
       alterItems(setenv),
     ],
     patch: [
-      validateMd5(),
       iff(isProvider('external'), discard('groupId')),
       alterItems(setenv),
     ],
