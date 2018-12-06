@@ -9,7 +9,7 @@ module.exports = function (options = {}) {
   return context => {
     return new Promise( (resolve, reject) => {
       const { method, app, result, data } = context;
-      const {key} = result;
+      const { key, type } = result;
 
       // ignore directories
       if(result.type === 'text/x-directory') return context;
@@ -22,6 +22,7 @@ module.exports = function (options = {}) {
             return reject(new errors.GeneralError('Could not initiate download link, please contact an administrator.'));
           }
           context.result.presign = {
+            method: 'GET',
             url,
             expiry: Date.now() + (expiry * 1000),
           };
@@ -32,20 +33,20 @@ module.exports = function (options = {}) {
         if (data.md5) return resolve(context);
         // this allows us to add restrictions to a write, like the file size
         app.buckets.private.createPresignedPost({
-          Bucket: result.bucket,
           Fields: {
             key,
+            'Content-Type': type,
+            success_action_status: '200',
           },
           Conditions: [
-            { 'bucket': result.bucket },
+            { 'key': key },
             ['content-length-range', 0, 1048576],
-            { 'success_action_status': '200' },
           ],
           Expires: expiry,
         }, (err, data) => {
-          data.fields.success_action_status = '200';
           // fields are a set of fields that must be included with the file upload.
           context.result.presign = {
+            method: 'POST',
             fields: data.fields,
             url: data.url,
             expiry: Date.now() + (expiry * 1000),
