@@ -12,7 +12,7 @@ module.exports = function (options = {}) {
       const { key, type } = result;
 
       // ignore directories
-      if(result.type === 'text/x-directory') return context;
+      if(result.type === 'text/x-directory') return resolve(context);
 
       // depending on the method, get a diff type of presigned
       if (method === 'get') { // read
