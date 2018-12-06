@@ -1,4 +1,4 @@
-import placehold from './placehold.vue';
+import explore from './explore.vue';
 import './content';
 
 export default {
@@ -9,14 +9,37 @@ export default {
     content: {
       name: 'Content',
       entry: true,
-      component: placehold,
-      path: '/group/{groupId}/content',
+      component: explore,
+      path: '/group/{groupId}/content/:path?',
       icon: 'folder',
       visiblePerms: [
         '{groupId}.content.write',
         '{groupId}.group.update',
       ],
     },
+    homepage: {
+      name: 'Group Home',
+      entry: true,
+      component: explore,
+      path: '/group/{groupId}/home/:path?',
+      icon: 'home',
+      meta: { parent: 'home' },
+      ifEnrolledIs: true,
+    },
   },
-  store: { content: {} },
+  store: {
+    content: {
+      state: {
+        isOperationPending: false,
+      },
+      mutations: {
+        unsetOperationPending(state) {
+          state.isOperationPending = false;
+        },
+        setOperationPending(state) {
+          state.isOperationPending = true;
+        },
+      },
+    },
+  },
 };
