@@ -3,6 +3,7 @@
 const DefaultSchema = require('../../../../types/default.schema');
 const ObjectIdType = require('../../../../types/objectId.type');
 const supportedFiles = require('../../supportedFiles');
+const exts = Object.values(supportedFiles).reduce((a, type) => [...a, ...type.ext], []);
 
 module.exports = function (app) {
   
@@ -12,7 +13,7 @@ module.exports = function (app) {
     name: {
       type: String,
       unique: true,
-      match: [/^[a-zA-Z0-9/-_.~]+$/, 'Invalid charaters used in filename.'],
+      match: [/^[a-zA-Z0-9/-_.~ ]+$/, 'Invalid charaters used in filename.'],
       required: [true, 'A file name is required'],
     },
     groupId: ObjectIdType('groups', app),
@@ -34,6 +35,12 @@ module.exports = function (app) {
       type: String,
       required: [true, 'A file type is required'],
       enum: Object.keys(supportedFiles),
+    },
+    ext: {
+      type: String,
+      required: [true, 'A file extension is required'],
+      enum: exts,
+      default: function(){ return supportedFiles[this.type].ext[0]; },
     },
   });
 

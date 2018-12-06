@@ -28,7 +28,7 @@ module.exports = {
   after: {
     all: [
       alterItems(rec => {const parts = rec.name.split('/'); parts.shift(); rec.filename = parts.pop(); rec.path = parts.join('/');}),
-      alterItems(rec => rec.key = `${rec.groupId}/${rec._id}.${rec.filename.split('.').pop()}`),
+      alterItems(rec => rec.key = `${rec.groupId}/${rec._id}.${rec.ext ? rec.ext : rec.filename.split('.').pop()}`),
       iff(isProvider('external'), discard('region', 'bucket')),
     ],
     find: [],
