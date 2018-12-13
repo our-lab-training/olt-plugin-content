@@ -1,13 +1,7 @@
 <template>
   <v-card @keyup.ctrl.83.stop="save">
     <v-toolbar dense>
-      <v-btn
-        @click.stop="$router.go(-1)"
-        flat
-        icon
-      >
-        <v-icon>far fa-arrow-alt-left</v-icon>
-      </v-btn>
+      <back-btn/>
       <v-toolbar-title>
         <span
           class="text-capitalize"
@@ -22,6 +16,7 @@
         icon
         :loading="isOperationPending"
         :disabled="isOperationPending || text === savedText"
+        v-shortkey="['ctrl', 's']" @shortkey="save()"
       >
         <v-icon>fal fa-save</v-icon>
       </v-btn>
@@ -55,6 +50,7 @@ import 'tui-editor/dist/tui-editor-extChart';
 import { mapGetters, mapState } from 'vuex';
 import store from '@/store';
 import supportedFiles from '../../../supportedFiles';
+import backBtn from '../back.vue';
 
 const chart = {
   name: 'chart',
@@ -67,6 +63,7 @@ const chart = {
 export default {
   components: {
     editor: Editor,
+    backBtn,
   },
   data() {
     return {
@@ -102,19 +99,21 @@ export default {
   methods: {
     async payload() {
       if (!this.current) return '';
-      if (this.current._id === this.loaded) return this.text;
+      if (this.loaded === this.current._id || this.current.type === 'text/x-directory') {
+        return this.text;
+      }
+      this.loaded = this.current._id;
       const file = await this.$content.readFile(this.current);
       const reader = new FileReader();
       reader.onload = (evt) => {
         if (this.opts && this.opts.lang) {
           this.text = `\`\`\`${this.opts.lang}\n${evt.target.result}\n\`\`\``;
         } else this.text = evt.target.result;
-        this.loaded = this.current._id;
       };
       return reader.readAsText(file);
     },
     async save() {
-      if (!this.current) return;
+      if (!this.current || this.text === this.savedText) return;
       if (this.filename === this.current.filename.replace(/\.[\w-]+$/, '')) {
         const path = this.current.path ? `${this.current.path}/` : '';
         const newName = `${this.current.groupId}/${path}${this.filename}.${this.ext}`;

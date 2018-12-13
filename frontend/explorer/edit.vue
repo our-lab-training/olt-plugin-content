@@ -3,10 +3,12 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import supportedFiles from '../../supportedFiles';
 import markdown from './edit/markdown.vue';
 import textEdit from './edit/text.vue';
+
+let disData;
 
 export default {
   components: {
@@ -18,7 +20,13 @@ export default {
   },
   computed: {
     ...mapGetters('content', { currentContent: 'current' }),
-    displayData() { return supportedFiles[this.currentContent.type]; },
+    ...mapState('content', ['isOperationPending']),
+    displayData() {
+      disData = this.isOperationPending
+        ? disData
+        : supportedFiles[this.currentContent.type];
+      return disData;
+    },
   },
   updated() {
     if (!supportedFiles[this.currentContent.type].edit) {

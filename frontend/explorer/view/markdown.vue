@@ -1,13 +1,7 @@
 <template>
   <v-card>
     <v-toolbar dense>
-      <v-btn
-        @click.stop="$router.go(-1)"
-        flat
-        icon
-      >
-        <v-icon>far fa-arrow-alt-left</v-icon>
-      </v-btn>
+      <back-btn />
       <v-toolbar-title>
         <span
           class="text-capitalize"
@@ -47,6 +41,7 @@ import 'tui-editor/dist/tui-editor-extUML';
 import 'tui-editor/dist/tui-editor-extColorSyntax';
 import 'tui-editor/dist/tui-editor-extChart';
 import { mapGetters } from 'vuex';
+import backBtn from '../back.vue';
 
 const chart = {
   name: 'chart',
@@ -59,6 +54,7 @@ const chart = {
 export default {
   components: {
     viewer: Viewer,
+    backBtn,
   },
   props: ['opts'],
   data() {
@@ -81,14 +77,16 @@ export default {
   methods: {
     async payload() {
       if (!this.current) return '';
-      if (this.loaded === this.current._id) return this.text;
+      if (this.loaded === this.current._id || this.current.type === 'text/x-directory') {
+        return this.text;
+      }
+      this.loaded = this.current._id;
       const file = await this.$content.readFile(this.current);
       const reader = new FileReader();
       reader.onload = (evt) => {
         if (this.opts && this.opts.lang) {
           this.text = `\`\`\`${this.opts.lang}\n${evt.target.result}\n\`\`\``;
         } else this.text = evt.target.result;
-        this.loaded = this.current._id;
       };
       return reader.readAsText(file);
     },

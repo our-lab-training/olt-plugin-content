@@ -1,10 +1,10 @@
 /* eslint-disable object-curly-newline */
 module.exports = {
   // images
-  'image/png': { name: 'PNG Image', icon: 'file-image', ext: ['png'], view: 'image' },
-  'image/jpeg': { name: 'JPEG Image', icon: 'file-image', ext: ['jpg', 'jpeg'], view: 'image' },
-  'image/gif': { name: 'GIF Image', icon: 'file-image', ext: ['gif'], view: 'image' },
-  'image/svg+xml': { name: 'SVG Image', icon: 'file-image', ext: ['svg'], view: 'image', edit: 'textEdit', opts: { lang: 'xml' } },
+  'image/png': { name: 'PNG Image', icon: 'file-image', ext: ['png'], view: 'imageView' },
+  'image/jpeg': { name: 'JPEG Image', icon: 'file-image', ext: ['jpg', 'jpeg'], view: 'imageView' },
+  'image/gif': { name: 'GIF Image', icon: 'file-image', ext: ['gif'], view: 'imageView' },
+  'image/svg+xml': { name: 'SVG Image', icon: 'file-image', ext: ['svg'], view: 'imageView', edit: 'textEdit', opts: { lang: 'xml' } },
   // video files
   'video/mp4': { name: 'MP4 Video', icon: 'file-video', ext: ['mp4', 'mpeg4'], view: 'video' },
   'video/x-flv': { name: 'FLV Video', icon: 'file-video', ext: ['flv'], view: 'video' },
