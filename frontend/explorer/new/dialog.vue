@@ -130,7 +130,6 @@ export default {
       if (this.type === 'directory') filename += '/.directory';
       const name = `${this.currentGroup._id}/${this.currParent.path ? `${this.currParent.path}/` : ''}${filename}`;
       const perms = (this.currParent.perms || []).filter(p => p !== 'superadmin.content.deleteroots');
-      console.log(name, perms);
       try {
         await this.$content.createFile(name, content, getType(filename), perms);
       } catch (err) {

@@ -104,7 +104,6 @@ export default {
     openFile() {
       this.$router.push();
     },
-    log(v) { console.log(v); },
   },
   watch: {
     active() {

@@ -79,7 +79,6 @@ const contentLib = {
   async _writeReq(content, payload) {
     // convert payload to file
     const { presign, type } = content;
-    console.log(presign);
     const filename = content.key.split('/').pop();// name.split('/').pop();
     let file = null;
     if (typeof payload === 'string') {
@@ -203,7 +202,6 @@ const contentLib = {
     link.setAttribute('target', '_blank');
     document.body.appendChild(link);
     link.click();
-    console.log(link);
     return file;
   },
   _sort(arr) {
