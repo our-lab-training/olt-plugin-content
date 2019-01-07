@@ -1,6 +1,7 @@
 const { alterItems, iff, isProvider, discard } = require('feathers-hooks-common');
 const presignedUrl = require('../../hooks/presigned-url');
 const checkCopy = require('../../hooks/check-copy');
+const disable = require('../../hooks/disable-suffix');
 const safeRemove = require('../../../../../hooks/safe-remove');
 
 const setenv = rec => {rec.bucket = process.env.AWS_BUCKET_PRIVATE; rec.region = process.env.AWS_REGION;};
@@ -22,7 +23,10 @@ module.exports = {
       iff(isProvider('external'), discard('groupId')),
       alterItems(setenv),
     ],
-    remove: [safeRemove()]
+    remove: [
+      disable(),
+      safeRemove(),
+    ]
   },
 
   after: {
