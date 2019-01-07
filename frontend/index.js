@@ -10,7 +10,7 @@ export default {
       name: 'Content',
       entry: true,
       component: explore,
-      path: '/group/{groupId}/content/:path?',
+      path: '/group/{groupId}/content/:path*',
       icon: 'folder',
       visiblePerms: [
         '{groupId}.content.write',
@@ -21,7 +21,7 @@ export default {
       name: 'Group Home',
       entry: true,
       component: explore,
-      path: '/group/{groupId}/home/:path?',
+      path: '/group/{groupId}/home/:path*',
       icon: 'home',
       meta: { parent: 'home' },
       ifEnrolledIs: true,

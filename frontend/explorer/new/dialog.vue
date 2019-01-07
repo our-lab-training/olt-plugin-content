@@ -1,15 +1,26 @@
 <template>
   <v-dialog
-      v-model="dialog"
+      :value="dialog"
+      @input="$emit('update:dialog', $event);"
       max-width="290"
     >
       <v-card>
         <v-card-title class="headline">Create a new {{fileRef}}.</v-card-title>
         <v-card-text>
           <span v-if="error" class="error--text">{{error}}<br><br></span>
-          Create a {{fileRef}} at <code>/{{parent.path}}</code>
+          {{type === 'upload' ? 'Upload' : 'Create'}} a {{fileRef}} at
+          <code>/{{currParent.path}}</code>
           <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="create()">
+            <file-upload
+              v-if="type === 'upload'"
+              v-model="uploadName"
+              @formData="file = $event.length ? $event[0] : null"
+              icon="fal fa-cloud-upload"
+              label="choose file..."
+              required
+            />
             <v-text-field
+              v-if="type !== 'upload' || file"
               :label="`Unique ${fileRef[0].toUpperCase()}${fileRef.slice(1)} Name`"
               :suffix="suffix"
               :hint="(!suffix && fileRef !== 'folder')
@@ -29,7 +40,7 @@
 
           <v-btn
             flat="flat"
-            @click="dialog = false"
+            @click="$emit('update:dialog', false);"
           >
             Cancel
           </v-btn>
@@ -52,8 +63,8 @@
 import { mapGetters, mapState } from 'vuex';
 import { capitalize } from 'lodash';
 import store from '@/store';
-import router from '@/router';
-import supportedFiles from '../../supportedFiles';
+import fileUpload from '@/views/partials/file-upload.vue';
+import supportedFiles from '../../../supportedFiles';
 
 const getType = (filename) => {
   const ext = filename.split('.').pop();
@@ -61,11 +72,32 @@ const getType = (filename) => {
   return Object.keys(supportedFiles).find(i => supportedFiles[i].ext.indexOf(ext) !== -1);
 };
 let suffix;
+let currentType;
+let currentParent;
 
 export default {
+  components: {
+    fileUpload,
+  },
+  props: {
+    type: {
+      type: String,
+      default: 'text',
+    },
+    parent: {
+      type: String,
+      default: '',
+    },
+    dialog: {
+      type: Boolean,
+      default: false,
+    },
+  },
   data() {
     return {
       valid: true,
+      file: null,
+      uploadName: '',
       filename: '',
       filenameRules: [
         v => /^[\w-. ]+$/.test(v) || 'Invalid file name charaters.',
@@ -74,12 +106,13 @@ export default {
           if (suffix && !RegExp(`${suffix.replace('.', '\\.')}$`).test(filename)) {
             filename += suffix;
           }
-          if (router.history.current.query.type === 'directory') filename += '/.directory';
+          if (currentType === 'directory') filename += '/.directory';
           if (!getType(filename)) return 'Invalid file extension.';
-          return !store.getters['content/find']({ query: { filename } }).data.length || 'This file name is already taken.';
+          const path = currentParent.path ? `${currentParent.path}/` : '';
+          const name = `${currentParent.groupId}/${path}${filename}`;
+          return !store.getters['content/find']({ query: { name } }).data.length || 'This file name is already taken.';
         },
       ],
-      dialog: true,
       error: '',
     };
   },
@@ -88,23 +121,22 @@ export default {
       this.error = '';
       if (!this.$refs.form.validate()) return;
       let content = '';
-      if (this.$route.query.type === 'markdown') content += `# ${capitalize(this.filename.split('.').shift())}`;
+      if (this.type === 'markdown') content += `# ${capitalize(this.filename.split('.').shift())}`;
+      if (this.type === 'upload') content = this.file;
       let { filename } = this;
       if (this.suffix && !RegExp(`${this.suffix.replace('.', '\\.')}$`).test(filename)) {
         filename += this.suffix;
       }
-      if (this.$route.query.type === 'directory') filename += '/.directory';
-      const name = `${this.currentGroup._id}/${this.parent.path ? `${this.parent.path}/` : ''}${filename}`;
-      const perms = (this.parent.perms || []).filter(p => p !== 'superadmin.content.deleteroots');
-      console.log(name, perms);
+      if (this.type === 'directory') filename += '/.directory';
+      const name = `${this.currentGroup._id}/${this.currParent.path ? `${this.currParent.path}/` : ''}${filename}`;
+      const perms = (this.currParent.perms || []).filter(p => p !== 'superadmin.content.deleteroots');
       try {
         await this.$content.createFile(name, content, getType(filename), perms);
       } catch (err) {
         this.error = `An error occured creating the new ${this.fileRef}, please contact an administrator.`;
         return console.error(err); // eslint-disable-line no-console, consistent-return
       }
-      this.dialog = false;
-      this.$router.replace('?');
+      this.$emit('update:dialog', false);
     },
   },
   computed: {
@@ -115,13 +147,32 @@ export default {
     }),
     ...mapState('content', ['isOperationPending']),
     ...mapGetters('groups', { currentGroup: 'current' }),
-    parent() {
-      return this.$route.query.parent
-        ? this.getContent(this.$route.query.parent)
+    currParent() {
+      currentParent = this.parent
+        ? this.getContent(this.parent)
         : this.currentContent;
+      return currentParent;
     },
-    suffix() { suffix = this.$route.query.type === 'markdown' ? '.md' : ''; return suffix; },
-    fileRef() { return this.$route.query.type === 'directory' ? 'folder' : 'file'; },
+    suffix() {
+      suffix = '';
+      if (this.type === 'markdown') suffix = '.md';
+      if (this.type === 'upload' && this.uploadName) {
+        suffix = `.${this.uploadName.split('.').pop()}`;
+      }
+      return suffix;
+    },
+    fileRef() { return this.type === 'directory' ? 'folder' : 'file'; },
+  },
+  watch: {
+    dialog() { this.$emit('update:dialog', this.dialog); },
+    type() { currentType = this.type; },
+    uploadName() {
+      if (this.uploadName) this.filename = this.uploadName;
+      else this.filename = '';
+    },
+  },
+  mounted() {
+    currentType = this.type;
   },
 };
 </script>

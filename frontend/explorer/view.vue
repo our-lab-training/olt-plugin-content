@@ -3,24 +3,36 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import supportedFiles from '../../supportedFiles';
 import directory from './view/directory.vue';
 import textView from './view/text.vue';
 import markdown from './view/markdown.vue';
+import download from './view/download.vue';
+import imageView from './view/image.vue';
+
+let disData;
 
 export default {
   components: {
     directory,
     textView,
     markdown,
+    download,
+    imageView,
   },
   data() {
     return {};
   },
   computed: {
     ...mapGetters('content', { currentContent: 'current' }),
-    displayData() { return supportedFiles[this.currentContent.type]; },
+    ...mapState('content', ['isOperationPending']),
+    displayData() {
+      disData = this.isOperationPending
+        ? disData
+        : supportedFiles[this.currentContent.type];
+      return disData;
+    },
   },
 };
 </script>

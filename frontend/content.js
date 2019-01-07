@@ -17,14 +17,23 @@ const contentLib = {
     store.commit('content/setCurrent', current._id);
     return get;
   },
-  _urltoFile(url, filename, type) {
+  _url2File(url, filename, type) {
     type = type || (url.match(/^data:([^;]+);/) || '')[1];
     return (fetch(url)
       .then(res => res.arrayBuffer())
       .then(buf => new File([buf], filename, { type }))
     );
   },
-  _fileMD5(file) {
+  _file2Url(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.readAsDataURL(file);
+    });
+  },
+  _file2MD5(file) {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (evt) => {
@@ -74,7 +83,7 @@ const contentLib = {
     let file = null;
     if (typeof payload === 'string') {
       if (/^((data:)|(https{0,1}:\/\/)|(s{0,1}ftp:\/\/))/.test(payload)) {
-        payload = await this._urltoFile(payload, filename, type);
+        payload = await this._url2File(payload, filename, type);
       } else payload = new Blob([payload], { type });
     }
     if (payload instanceof File) file = payload;
@@ -83,7 +92,7 @@ const contentLib = {
     }
     if (!file) throw new Error('Unknown payload type.');
     // gen md5
-    const filemd5 = await this._fileMD5(file);
+    const filemd5 = await this._file2MD5(file);
 
     // build request
     const fd = new FormData();
@@ -180,6 +189,32 @@ const contentLib = {
     await content.save();
     store.commit('content/unsetOperationPending');
     return content;
+  },
+  async downloadFile(name) {
+    store.commit('content/setOperationPending');
+    let content = await this._findFile(name);
+    content = await this._getPresign(content, 'read');
+    const file = await this._readReq(content);
+    const link = document.createElement('a');
+    link.href = await this._file2Url(file);
+    store.commit('content/unsetOperationPending');
+    link.setAttribute('download', content.filename);
+    link.setAttribute('target', '_blank');
+    document.body.appendChild(link);
+    link.click();
+    return file;
+  },
+  _sort(arr) {
+    const dir = 'text/x-directory';
+    return arr.sort((a, b) => {
+      if (a.type === dir && b.type !== dir) return -1;
+      if (a.type !== dir && b.type === dir) return 1;
+      const an = (a.type === dir ? a.path.split('/').pop() : a.filename).toLowerCase();
+      const bn = (b.type === dir ? b.path.split('/').pop() : b.filename).toLowerCase();
+      if (an < bn) return -1;
+      if (an > bn) return 1;
+      return 0;
+    });
   },
 };
 
