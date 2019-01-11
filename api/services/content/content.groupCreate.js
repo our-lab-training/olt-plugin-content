@@ -2,14 +2,7 @@ const _ = require('lodash');
 
 const defaultContent = [
   {
-    name: '{groupId}/.directory',
-    perms: [
-      'superadmin.content.deleteroots',
-    ],
-    type: 'text/x-directory'
-  },
-  {
-    name: '{groupId}/home/.directory',
+    name: '.directory',
     perms: [
       'superadmin.content.deleteroots',
     ],
