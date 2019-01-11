@@ -17,15 +17,6 @@ export default {
         '{groupId}.group.update',
       ],
     },
-    homepage: {
-      name: 'Group Home',
-      entry: true,
-      component: explore,
-      path: '/group/{groupId}/home/:path*',
-      icon: 'home',
-      meta: { parent: 'home' },
-      ifEnrolledIs: true,
-    },
   },
   store: {
     content: {

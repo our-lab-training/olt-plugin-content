@@ -19,6 +19,7 @@
         hoverable
         :multiple-active="multiple"
         item-key="key"
+        open-on-click
       >
         <template slot="prepend" slot-scope="{ item, open, leaf, active }">
           <v-icon
@@ -54,38 +55,31 @@ export default {
   },
   computed: {
     ...mapGetters('groups', { currentGroup: 'current' }),
-    ...mapGetters('content', { currentContent: 'current', findCont: 'find' }),
+    ...mapGetters('content', { currentContent: 'current', findCont: 'find', getCont: 'get' }),
     showHidden() { return typeof this.$route.query.showHidden !== 'undefined'; },
     items() {
-      const getPath = (path, parent) => {
-        let res = this.findCont({
-          query: {
-            _id: { $ne: parent },
-            groupId: this.currentGroup._id,
-            $or: [{
-              path: v => RegExp(`^${path ? `${path}/` : ''}[^/]+$`, 'i').test(v),
-              type: 'text/x-directory',
-            }, {
-              path,
-              type: { $ne: 'text/x-directory' },
-            }],
-          },
-        }).data;
+      const roots = this.findCont({
+        query: {
+          name: '.directory',
+          groupId: this.currentGroup._id,
+          parent: { $exists: false },
+        },
+      }).data;
+      if (!roots) return [{ name: 'Corrupt content configuration!' }];
+      const getPath = (parent) => {
+        let res = this.findCont({ query: { parent } }).data;
         // eslint-disable-next-line vue/no-side-effects-in-computed-properties
         res = this.$content._sort(res);
         return res.reduce((a, cont) => {
           if (cont._id === parent) return a;
           const child = {
-            name: cont.type === 'text/x-directory'
-              ? cont.path.split('/').pop()
-              : cont.filename,
+            name: cont.filename,
             type: cont.type,
           };
           if (/^\./.test(child.name) && !this.showHidden) return a;
-          child.key = `${cont.path ? `${cont.path}/` : ''}${cont.filename}`;
+          child.key = cont._id;
           if (cont.type === 'text/x-directory') {
-            child.key = cont.path;
-            child.children = getPath(cont.path, cont._id);
+            child.children = getPath(cont._id);
           }
           return [...a, child];
         }, []);
@@ -95,7 +89,7 @@ export default {
           name: '/',
           key: '',
           type: 'text/x-directory',
-          children: getPath('', null),
+          children: getPath(roots[0]._id),
         },
       ];
     },
@@ -107,35 +101,25 @@ export default {
   },
   watch: {
     active() {
-      const path = this.currentContent.path ? `${this.currentContent.path}/` : '';
       if (
         this.multiple
         || this.active.length !== 1
-        || (
-          this.currentContent.type === 'text/x-directory'
-          && this.active[0] === path
-        ) || (
-          this.currentContent.type !== 'text/x-directory'
-          && this.active[0] === `${path}${this.currentContent.filename}`
-        )
+        || this.active[0] === this.currentContent._id
       ) return;
       this.$router.contPush(this.active[0]);
     },
   },
   mounted() {
     if (!this.currentContent) return;
-    const path = this.currentContent.path ? `${this.currentContent.path}/` : '';
-    const parts = path.split('/');
-    const open = [''];
-    parts.forEach((p) => {
-      if (p) {
-        const last = open[open.length - 1];
-        open.push(`${last ? `${last}/` : ''}${p}`);
-      }
-    });
+    let curr = this.currentContent;
+    const open = ['', curr._id];
+    while (curr.parent) {
+      open.push(curr.parent);
+      curr = this.getCont(curr.parent);
+    }
     this.open = open;
     if (this.currentContent.type === 'text/x-directory') return;
-    this.active = [`${path}${this.currentContent.filename}`];
+    this.active = [this.currentContent._id];
   },
 };
 </script>
@@ -143,6 +127,10 @@ export default {
 <style>
 .v-treeview-node:not(.v-treeview-node--leaf) > div > div > .folder-icon {
   margin-left: 9px;
+}
+
+.v-treeview-node__content {
+  cursor: pointer;
 }
 </style>
 

@@ -94,8 +94,7 @@ export default {
     async save() {
       if (!this.current || this.text === this.savedText) return;
       if (this.filename === this.current.filename.replace(/\.[\w-]+$/, '')) {
-        const path = this.current.path ? `${this.current.path}/` : '';
-        const newName = `${this.current.groupId}/${path}${this.filename}.${this.ext}`;
+        const newName = `${this.filename}.${this.ext}`;
         await this.$content.renameFile(this.current, newName);
       }
       if (this.current.type !== this.type) {

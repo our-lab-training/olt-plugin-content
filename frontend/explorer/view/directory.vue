@@ -36,25 +36,24 @@
         >
           <v-flex
             xs6 sm4 lg3 xl2
-            v-for="(subdir) in subdirs"
+            v-for="(subdir) in subdirs.filter(d => !/^\./.test(d.name) || showHidden)"
             :key="subdir._id"
-            v-if="!/^\./.test(subdir.path.replace(RegExp(`$${dir.path}/`, 'i'), '')) || showHidden"
           >
             <v-card
               hover
-              :to="subdir.path"
-              @click.prevent="$router.contPush(subdir.path)"
+              :to="subdir._id"
+              @click.prevent="$router.contPush(subdir._id)"
               @contextmenu="showMenu($event, subdir)"
             >
               <v-card-title class="text-capitalize body-2">
                 <file-icon :content="subdir" size="2"/>
                 <v-badge
                   color="white"
-                  :value="/^\./.test(subdir.path.replace(RegExp(`^${dir.path}/`, 'i'), ''))"
+                  :value="/^\./.test(subdir.name)"
                 >
                   <v-icon slot="badge" small>fal fa-eye-slash</v-icon>
                   <span>
-                    {{subdir.path.replace(RegExp(`^${dir.path}/`, 'i'), '')}}
+                    {{subdir.name}}
                   </span>
                 </v-badge>
               </v-card-title>
@@ -69,15 +68,14 @@
         >
           <v-flex
             xs6 sm4 lg3 xl2
-            v-for="(subfile) in subfiles"
+            v-for="(subfile) in subfiles.filter(f => !/^\./.test(f.filename) || showHidden)"
             :key="subfile.key"
-            v-if="!/^\./.test(subfile.filename) || showHidden"
           >
             <v-card
               hover
-              :to="`${subfile.path ? `${subfile.path}/` : ''}${subfile.filename}`"
+              :to="subfile._id"
               @click.prevent="
-                $router.contPush(`${subfile.path ? `${subfile.path}/` : ''}${subfile.filename}`)
+                $router.contPush(subfile._id)
               "
               @contextmenu="showMenu($event, subfile)"
             >
@@ -116,7 +114,7 @@
       <v-list>
         <v-list-tile
           class="error--text"
-          @click.stop="$content.deleteFile(menu.context.name); menu.show=false;"
+          @click.stop="$content.deleteFile(menu.context); menu.show=false;"
         >
           <v-list-tile-action><v-icon>far fa-trash</v-icon></v-list-tile-action>
           <v-list-tile-title>Delete</v-list-tile-title>
@@ -161,17 +159,14 @@ export default {
   },
   computed: {
     ...mapGetters('groups', { currentGroup: 'current' }),
-    ...mapGetters('content', { dir: 'current', findContent: 'find' }),
+    ...mapGetters('content', { dir: 'current', findContent: 'find', getContent: 'get' }),
     ...mapState('content', ['isOperationPending']),
     showHidden() { return typeof this.$route.query.showHidden !== 'undefined'; },
     subdirs() {
       let res = this.findContent({
         query: {
-          groupId: this.currentGroup._id,
-          // eslint-disable-next-line
-          path: v => RegExp(`^${this.dir.path ? `${this.dir.path}/` : ''}[^/]+$`, 'i').test(v),
+          parent: this.dir._id,
           type: 'text/x-directory',
-          _id: { $ne: this.dir._id },
         },
       }).data;
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
@@ -181,11 +176,8 @@ export default {
     subfiles() {
       let res = this.findContent({
         query: {
-          groupId: this.currentGroup._id,
-          // eslint-disable-next-line
-          path: this.dir.path,
+          parent: this.dir._id,
           type: { $ne: 'text/x-directory' },
-          _id: { $ne: this.dir._id },
         },
       }).data;
       // eslint-disable-next-line vue/no-side-effects-in-computed-properties
@@ -194,19 +186,14 @@ export default {
     },
     crumbs() {
       if (!this.dir) return [];
-      const path = this.dir.path ? `${this.dir.path}/` : '';
-      const parts = path.split('/');
-      const crumbs = [{ text: '/', to: '' }];
-      parts.forEach((p) => {
-        if (p) {
-          const last = crumbs[crumbs.length - 1];
-          crumbs.push({
-            text: p,
-            to: `${last.to ? `${last.to}/` : ''}${p}`,
-          });
-        }
-      });
-      return crumbs;
+      const crumbs = [];
+      let curr = this.dir;
+      while (curr.parent) {
+        crumbs.push({ text: curr.name, to: curr._id });
+        curr = this.getContent(curr.parent);
+      }
+      crumbs.push({ text: '/', to: '' });
+      return crumbs.reverse();
     },
   },
   methods: {
