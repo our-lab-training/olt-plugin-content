@@ -18,26 +18,41 @@ import tree from './explorer/tree.vue';
 import viewFile from './explorer/view.vue';
 import editFile from './explorer/edit.vue';
 
-const isDirectory = (path, parent = '', groupId) => {
-  const name = `${groupId}${parent ? `/${parent}` : ''}${path ? `/${path.replace(/\/$/, '')}` : ''}/.directory`;
+/* const isDirectory = (path, parent = '', groupId) => {
+  const name = `${groupId}${parent
+    ? `/${parent}`
+    : ''
+  }${path ? `/${path.replace(/\/$/, '')}` : ''}/.directory`;
   const contents = store.getters['content/find']({ query: { name } }).data;
   return contents.length ? contents[0]._id : null;
 };
 const isFile = (path, parent = '', groupId) => {
-  const name = `${groupId}${parent ? `/${parent}` : ''}${path ? `/${path.replace(/\/$/, '')}` : ''}`;
+  const name = `${groupId}${parent
+    ? `/${parent}`
+    : ''
+  }${path ? `/${path.replace(/\/$/, '')}` : ''}`;
   const contents = store.getters['content/find']({ query: { name } }).data;
   return contents.length ? contents[0]._id : null;
-};
+}; */
 
 const loadPath = (to, from, next) => {
   const group = store.getters['groups/current'];
   // console.log(to, store.getters['content/find']());
   const { path } = to.params;
-  const { parent } = to.meta;
+  // const { parent } = to.meta;
   const gPath = (to.meta.path || '').replace('{groupId}', group.slugs ? group.slugs[0] : group._id);
   router.contPush = p => router.push(gPath.replace(':path*', p));
-  let pathId = isDirectory(path, parent, group._id);
-  if (!pathId) pathId = isFile(path, parent, group._id);
+  let pathId = null;
+  if (!path) {
+    const contents = store.getters['content/find']({
+      query: {
+        name: '.directory',
+        groupId: group._id,
+        parent: { $exists: false },
+      },
+    }).data;
+    if (contents.length) pathId = contents[0]._id;
+  } else pathId = store.getters['content/get'](path);
   if (!pathId) return next(gPath.replace(':path*', '') || '/');
   store.commit('content/setCurrent', pathId);
   return next();

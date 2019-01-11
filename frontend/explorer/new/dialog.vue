@@ -106,10 +106,8 @@ export default {
           if (suffix && !RegExp(`${suffix.replace('.', '\\.')}$`).test(filename)) {
             filename += suffix;
           }
-          if (currentType === 'directory') filename += '/.directory';
-          if (!getType(filename)) return 'Invalid file extension.';
-          const path = currentParent.path ? `${currentParent.path}/` : '';
-          const name = `${currentParent.groupId}/${path}${filename}`;
+          if (currentType !== 'directory' && !getType(filename)) return 'Invalid file extension.';
+          const name = filename;
           return !store.getters['content/find']({ query: { name } }).data.length || 'This file name is already taken.';
         },
       ],
@@ -127,11 +125,11 @@ export default {
       if (this.suffix && !RegExp(`${this.suffix.replace('.', '\\.')}$`).test(filename)) {
         filename += this.suffix;
       }
-      if (this.type === 'directory') filename += '/.directory';
-      const name = `${this.currentGroup._id}/${this.currParent.path ? `${this.currParent.path}/` : ''}${filename}`;
+      const type = this.type === 'directory' ? 'text/x-directory' : getType(filename);
+      const name = filename;
       const perms = (this.currParent.perms || []).filter(p => p !== 'superadmin.content.deleteroots');
       try {
-        await this.$content.createFile(name, content, getType(filename), perms);
+        await this.$content.createFile(name, (this.currParent || {})._id, content, type, perms);
       } catch (err) {
         this.error = `An error occured creating the new ${this.fileRef}, please contact an administrator.`;
         return console.error(err); // eslint-disable-line no-console, consistent-return
