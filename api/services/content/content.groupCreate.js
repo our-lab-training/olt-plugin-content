@@ -22,10 +22,10 @@ module.exports = (app) => {
 
     await Promise.all(contents.map(async (content) => {
       // create content
-      const parts = content.name.split('/');
-      parts.shift();
-      parts.unshift(group._id);
-      content.name = parts.join('/');
+      // const parts = content.name.split('/');
+      // parts.shift();
+      // parts.unshift(group._id);
+      // content.name = parts.join('/');
       delete content._id;
       content.groupId = group._id;
       await app.service('content').create(content);
