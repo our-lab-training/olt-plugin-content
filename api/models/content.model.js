@@ -12,10 +12,11 @@ module.exports = function (app) {
   content.add({
     name: {
       type: String,
-      unique: true,
-      match: [/^[a-zA-Z0-9/-_.~ ]+$/, 'Invalid charaters used in filename.'],
+      unique: false,
+      match: [/^[a-zA-Z0-9-_.~ ]+$/, 'Invalid charaters used in filename.'],
       required: [true, 'A file name is required'],
     },
+    parent: ObjectIdType('content', app, { required: false }),
     groupId: ObjectIdType('groups', app),
     perms: [{
       type: String,
