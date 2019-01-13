@@ -8,13 +8,13 @@ const contentLib = {
   async _get(id) {
     const current = store.getters['content/current'];
     const get = await store.dispatch('content/get', id);
-    store.commit('content/setCurrent', current._id);
+    store.commit('content/setCurrent', (current || {})._id);
     return get;
   },
   async _patch(id, data) {
     const current = store.getters['content/current'];
     const get = await store.dispatch('content/patch', [id, data]);
-    store.commit('content/setCurrent', current._id);
+    store.commit('content/setCurrent', (current || {})._id);
     return get;
   },
   _url2File(url, filename, type) {
@@ -50,7 +50,7 @@ const contentLib = {
     const currGroup = store.getters['groups/current'];
     if (!currGroup) throw new Error('Not operating in the context of any group.');
     let query = { groupId: currGroup._id, name };
-    if (/^[0-9abcdef]{24}$/.test(name)) query = { groupId: currGroup._id, _id: name };
+    if (/^[0-9abcdef]{24}$/.test(name)) query = { groupId: currGroup._id, $or: [{ _id: name }, { name }] };
 
     const parentContent = parent
       ? await this._findFile(parent, null, { ...opts, type: 'text/x-directory' })
@@ -68,7 +68,7 @@ const contentLib = {
     if (res.length) throw new Error('File description given is too vuage.');
 
     // not found, so let's create
-    if (!opts.createIfNotFound || query._id) throw new Error('Specified file was not found.');
+    if (!opts.createIfNotFound) throw new Error('Specified file was not found.');
 
     const current = store.getters['content/current'];
     let cont = new Content({
@@ -80,7 +80,7 @@ const contentLib = {
     });
     cont = await cont.save();
 
-    store.commit('content/setCurrent', current._id);
+    store.commit('content/setCurrent', (current || {})._id);
     return cont;
   },
   async _readReq(content) {
@@ -151,12 +151,21 @@ const contentLib = {
     const fileName = parts.pop();
     let parentContent = null;
     if (parts.length) {
+      const currGroup = store.getters['groups/current'];
+      if (!currGroup) throw new Error('Not operating in the context of any group.');
+      const root = store.getters['content/find']({
+        query: {
+          name: '.directory',
+          groupId: currGroup._id,
+          parent: { $exists: false },
+        },
+      }).data[0];
       parentContent = await parts.reduce(async (a, p) =>
-        this._findFile(p, a ? await a : null, {
+        this._findFile(p, a ? (await a) : null, {
           createIfNotFound: true,
           type: 'text/x-directory',
           perms,
-        }), null);
+        }), (async () => root._id)());
     }
     if (payload instanceof File) type = payload.type; // eslint-disable-line prefer-destructuring
     if (!type) throw new Error('Mime-Type must be specified when creating a file, either as an arg or passing a File as the payload.');
@@ -171,7 +180,7 @@ const contentLib = {
       file = await this._writeReq(content, payload);
     }
     store.commit('content/unsetOperationPending');
-    return file;
+    return { content, file, type };
   },
   async writeFile(name, parent, payload) {
     store.commit('content/setOperationPending');
