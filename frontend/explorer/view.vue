@@ -10,6 +10,7 @@ import textView from './view/text.vue';
 import markdown from './view/markdown.vue';
 import download from './view/download.vue';
 import imageView from './view/image.vue';
+import msdocView from './view/msdoc.vue';
 
 let disData;
 
@@ -20,6 +21,7 @@ export default {
     markdown,
     download,
     imageView,
+    msdocView,
   },
   data() {
     return {};

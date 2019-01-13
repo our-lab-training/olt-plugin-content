@@ -4,7 +4,7 @@
     @shortkey="multiple = !multiple"
     style="overflow-x: auto;"
   >
-    <v-toolbar dense>
+    <v-toolbar v-if="!inputMode" dense>
       <v-toolbar-title class="text-capitalize">
         {{$route.name}}
       </v-toolbar-title>
@@ -41,6 +41,20 @@ import supportedFiles from '../../supportedFiles';
 import fileIcon from './fileIcon.vue';
 
 export default {
+  props: {
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
+    inputMode: {
+      type: Boolean,
+      default: false,
+    },
+    value: {
+      type: String,
+      default: () => undefined,
+    },
+  },
   components: {
     fileIcon,
   },
@@ -50,22 +64,29 @@ export default {
       tree: [],
       active: [],
       supportedFiles,
-      multiple: false,
     };
   },
   computed: {
     ...mapGetters('groups', { currentGroup: 'current' }),
-    ...mapGetters('content', { currentContent: 'current', findCont: 'find', getCont: 'get' }),
-    showHidden() { return typeof this.$route.query.showHidden !== 'undefined'; },
-    items() {
-      const roots = this.findCont({
+    ...mapGetters('content', { getCurrentContent: 'current', findCont: 'find', getCont: 'get' }),
+    root() {
+      return this.findCont({
         query: {
           name: '.directory',
           groupId: this.currentGroup._id,
           parent: { $exists: false },
         },
-      }).data;
-      if (!roots) return [{ name: 'Corrupt content configuration!' }];
+      }).data[0];
+    },
+    currentContent() {
+      return (this.inputMode
+        ? this.getCont(this.value)
+        : this.getCurrentContent
+      ) || this.root;
+    },
+    showHidden() { return typeof this.$route.query.showHidden !== 'undefined'; },
+    items() {
+      if (!this.root) return [{ name: 'Corrupt content configuration!' }];
       const getPath = (parent) => {
         let res = this.findCont({ query: { parent } }).data;
         // eslint-disable-next-line vue/no-side-effects-in-computed-properties
@@ -89,14 +110,9 @@ export default {
           name: '/',
           key: '',
           type: 'text/x-directory',
-          children: getPath(roots[0]._id),
+          children: getPath(this.root._id),
         },
       ];
-    },
-  },
-  methods: {
-    openFile() {
-      this.$router.push();
     },
   },
   watch: {
@@ -106,7 +122,8 @@ export default {
         || this.active.length !== 1
         || this.active[0] === this.currentContent._id
       ) return;
-      this.$router.contPush(this.active[0]);
+      if (this.inputMode) this.$emit('input', this.active[0]);
+      else this.$router.contPush(this.active[0]);
     },
   },
   mounted() {
