@@ -16,7 +16,7 @@ module.exports = function (app) {
       match: [/^[a-zA-Z0-9-_.~ ]+$/, 'Invalid charaters used in filename.'],
       required: [true, 'A file name is required'],
     },
-    parent: ObjectIdType('content', app, { required: false }),
+    parent: ObjectIdType('content', app, false),
     groupId: ObjectIdType('groups', app),
     perms: [{
       type: String,
