@@ -86,6 +86,7 @@ const contentLib = {
   async _readReq(content) {
     const { filename, presign } = content;
     const res = await fetch(presign.url);
+    if (res.status !== 200) throw new Error('An issue occured and the file could not be loaded.');
     return new File([await res.blob()], filename, res.headers['Content-Type']);
   },
   async _writeReq(content, payload) {
@@ -137,11 +138,24 @@ const contentLib = {
     }
     throw new Error('Unknown Method');
   },
-  async readFile(name, parent) {
+  async readFile(name, parent, c = 0) {
     store.commit('content/setOperationPending');
-    let content = await this._findFile(name, parent);
-    content = await this._getPresign(content, 'read');
-    const file = await this._readReq(content);
+    let file = null;
+    let content = null;
+    try {
+      content = await this._findFile(name, parent);
+      content = await this._getPresign(content, 'read');
+      file = await this._readReq(content);
+    } catch (err) {
+      if (c >= 3) file = new File([err.message], content.filename);
+      else {
+        file = await (() => new Promise((resolve, reject) => {
+          setTimeout(() => {
+            this.readFile(content || name, parent, c + 1).then(resolve).catch(reject);
+          }, 1000);
+        }))();
+      }
+    }
     store.commit('content/unsetOperationPending');
     return file;
   },
