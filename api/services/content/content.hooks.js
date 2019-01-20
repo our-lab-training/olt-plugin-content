@@ -1,3 +1,4 @@
+const { authenticate } = require('@feathersjs/authentication').hooks;
 const { alterItems, iff, isProvider, discard } = require('feathers-hooks-common');
 const presignedUrl = require('../../hooks/presigned-url');
 const checkCopy = require('../../hooks/check-copy');
@@ -8,7 +9,7 @@ const setenv = rec => {rec.bucket = process.env.AWS_BUCKET_PRIVATE; rec.region =
 
 module.exports = {
   before: {
-    all: [],
+    all: [authenticate('jwt')],
     find: [],
     get: [],
     create: [
