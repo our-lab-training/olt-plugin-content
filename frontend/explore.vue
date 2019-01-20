@@ -72,13 +72,9 @@ export default {
     ...mapGetters('content', { currentContent: 'current' }),
   },
   beforeRouteEnter: async (to, from, next) => {
-    const group = store.getters['groups/current'];
-    await store.dispatch('content/find', { query: { groupId: group._id } });
     loadPath(to, from, next);
   },
   beforeRouteUpdate: async (to, from, next) => {
-    const group = store.getters['groups/current'];
-    await store.dispatch('content/find', { query: { groupId: group._id } });
     loadPath(to, from, next);
   },
   beforeRouteLeave: (to, from, next) => { store.commit('content/clearCurrent'); next(); },

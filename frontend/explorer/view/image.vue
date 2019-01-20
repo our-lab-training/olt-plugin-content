@@ -6,12 +6,12 @@
         <span
           class="text-capitalize"
           ref="filename"
-        >{{current.filename.replace(/\.[\w-]+$/, '')}}</span>.{{ext}}
+        >{{((current && current.filename) || '').replace(/\.[\w-]+$/, '')}}</span>.{{ext}}
       </v-toolbar-title>
       <v-spacer></v-spacer>
     </v-toolbar>
     <v-card-text class="grey img-wrap">
-      <img v-if="!isOperationPending" :src="src" :alt="current.filename"/>
+      <img v-if="!isOperationPending" :src="src" :alt="(current || {}).filename"/>
       <v-icon v-else dark>fas fa-circle-notch fa-spin</v-icon>
     </v-card-text>
   </v-card>
@@ -33,7 +33,7 @@ export default {
   computed: {
     ...mapGetters('content', ['current']),
     ...mapState('content', ['isOperationPending']),
-    ext() { return this.current.filename.split('.').pop(); },
+    ext() { return this.current && this.current.filename.split('.').pop(); },
   },
   mounted() { this.payload(); },
   updated() { this.payload(); },

@@ -30,6 +30,7 @@ export default {
     ...mapGetters('content', { currentContent: 'current' }),
     ...mapState('content', ['isOperationPending']),
     displayData() {
+      if (!this.currentContent) return disData;
       disData = this.isOperationPending
         ? disData
         : supportedFiles[this.currentContent.type];
