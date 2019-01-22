@@ -1,5 +1,6 @@
 import explore from './explore.vue';
 import './content';
+import perms from '../perms';
 
 export default {
   ref: 'content',
@@ -13,8 +14,7 @@ export default {
       path: '/group/{groupId}/content/:path*',
       icon: 'folder',
       visiblePerms: [
-        '{groupId}.content.write',
-        '{groupId}.group.update',
+        '{groupId}.content.read',
       ],
     },
   },
@@ -33,4 +33,5 @@ export default {
       },
     },
   },
+  perms,
 };
