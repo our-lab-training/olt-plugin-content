@@ -10,6 +10,7 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn
+        v-if="hasPerm(`${currentGroup._id}.content.write`)"
         @click.stop="loading = true;"
         flat
         icon
@@ -69,6 +70,8 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('users', { hasPerm: 'hasPerm' }),
+    ...mapGetters('groups', { currentGroup: 'current' }),
     ...mapGetters('content', ['current']),
     ext() { return this.current.filename.split('.').pop(); },
   },

@@ -5,7 +5,7 @@ import perms from '../perms';
 export default {
   ref: 'content',
   name: 'Content',
-  settingsLink: '/group/{groupId}/content/settings',
+  // settingsLink: '/group/{groupId}/content/settings',
   routes: {
     content: {
       name: 'Content',

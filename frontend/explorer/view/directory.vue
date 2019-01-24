@@ -115,6 +115,7 @@
         <v-list-tile
           class="error--text"
           @click.stop="$content.deleteFile(menu.context); menu.show=false;"
+          v-if="hasPerm(`${currentGroup._id}.content.write`)"
         >
           <v-list-tile-action><v-icon>far fa-trash</v-icon></v-list-tile-action>
           <v-list-tile-title>Delete</v-list-tile-title>
@@ -161,6 +162,7 @@ export default {
     ...mapGetters('groups', { currentGroup: 'current' }),
     ...mapGetters('content', { dir: 'current', findContent: 'find', getContent: 'get' }),
     ...mapState('content', ['isOperationPending']),
+    ...mapGetters('users', { hasPerm: 'hasPerm' }),
     showHidden() { return typeof this.$route.query.showHidden !== 'undefined'; },
     subdirs() {
       let res = this.findContent({
