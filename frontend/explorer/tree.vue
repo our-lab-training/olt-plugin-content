@@ -4,10 +4,18 @@
     @shortkey="multiple = !multiple"
     style="overflow-x: auto;"
   >
-    <v-toolbar v-if="!inputMode" dense>
+    <v-toolbar dense>
       <v-toolbar-title class="text-capitalize">
-        {{$route.name}}
+        {{!inputMode ? $route.name : 'Select A File'}}
       </v-toolbar-title>
+      <v-spacer />
+      <v-flex shrink>
+        <v-text-field
+          class="content-search"
+          v-model="search"
+          append-icon="far fa-search"
+        />
+      </v-flex>
     </v-toolbar>
     <v-card-text>
       <v-treeview
@@ -64,6 +72,7 @@ export default {
       tree: [],
       active: [],
       supportedFiles,
+      search: '',
     };
   },
   computed: {
@@ -86,6 +95,7 @@ export default {
     },
     showHidden() { return typeof this.$route.query.showHidden !== 'undefined'; },
     items() {
+      const searchResults = [];
       if (!this.root) return [{ name: 'Corrupt content configuration!' }];
       const getPath = (parent) => {
         let res = this.findCont({ query: { parent } }).data;
@@ -102,9 +112,16 @@ export default {
           if (cont.type === 'text/x-directory') {
             child.children = getPath(cont._id);
           }
+          searchResults.push(child);
           return [...a, child];
         }, []);
       };
+      if (this.search.trim()) {
+        const reg = RegExp(`(${this.search.trim().replace(/\s/g, ')|(')})`, 'i');
+        getPath(this.root._id);
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
+        return this.$content._sort(searchResults.filter(child => reg.test(child.name)));
+      }
       return [
         {
           name: '/',
@@ -148,6 +165,11 @@ export default {
 
 .v-treeview-node__content {
   cursor: pointer;
+}
+
+.content-search {
+  width: min-content;
+  min-width: 100px;
 }
 </style>
 

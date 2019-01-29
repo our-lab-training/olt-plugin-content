@@ -261,8 +261,8 @@ const contentLib = {
     return arr.sort((a, b) => {
       if (a.type === dir && b.type !== dir) return -1;
       if (a.type !== dir && b.type === dir) return 1;
-      const an = (a.type === dir ? a.path.split('/').pop() : a.filename).toLowerCase();
-      const bn = (b.type === dir ? b.path.split('/').pop() : b.filename).toLowerCase();
+      const an = (a.type === dir ? a.path.split('/').pop() : a.filename || a.name).toLowerCase();
+      const bn = (b.type === dir ? b.path.split('/').pop() : b.filename || b.name).toLowerCase();
       if (an < bn) return -1;
       if (an > bn) return 1;
       return 0;
