@@ -12,7 +12,7 @@ export default {
       entry: true,
       component: explore,
       path: '/group/{groupId}/content/:path*',
-      icon: 'folder',
+      icon: 'fal fa-folder-open',
       visiblePerms: [
         '{groupId}.content.read',
       ],
