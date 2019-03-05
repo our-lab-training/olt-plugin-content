@@ -30,27 +30,27 @@
 /* eslint-disable no-extraneous-dependencies */
 // import 'tui-editor/dist/tui-editor-contents.css';
 import 'tui-editor/dist/tui-editor.css';
-import 'tui-chart/dist/tui-chart.min.css';
+// import 'tui-chart/dist/tui-chart.min.css';
 import 'tui-color-picker/dist/tui-color-picker.min.css';
 import { Viewer } from '@toast-ui/vue-editor';
 import 'tui-color-picker';
-import 'raphael';
-import 'tui-chart';
+// import 'raphael';
+// import 'tui-chart';
 import 'tui-editor/dist/tui-editor-extScrollSync';
 import 'tui-editor/dist/tui-editor-extTable';
 import 'tui-editor/dist/tui-editor-extUML';
 import 'tui-editor/dist/tui-editor-extColorSyntax';
-import 'tui-editor/dist/tui-editor-extChart';
+// import 'tui-editor/dist/tui-editor-extChart';
 import { mapGetters } from 'vuex';
 import backBtn from '../back.vue';
 
-const chart = {
+/* const chart = {
   name: 'chart',
   minWidth: 100,
   maxWidth: 600,
   minHeight: 100,
   maxHeight: 300,
-};
+}; */
 
 export default {
   components: {
@@ -65,7 +65,7 @@ export default {
       loading: false,
       options: {
         usageStatistics: false,
-        exts: ['scrollSync', 'colorSyntax', 'uml', chart, 'table'],
+        exts: ['scrollSync', 'colorSyntax', 'uml', /* chart, */ 'table'],
       },
     };
   },
