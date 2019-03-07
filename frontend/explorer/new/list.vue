@@ -1,20 +1,20 @@
 <template>
   <v-list>
-    <v-list-tile to="#" @click.prevent="openDialog('markdown')">
+    <v-list-tile @click.stop="openDialog('markdown')">
       <v-list-tile-action><v-icon>fal fa-file-invoice</v-icon></v-list-tile-action>
       <v-list-tile-title>New Document</v-list-tile-title>
     </v-list-tile>
-    <v-list-tile to="#" @click.prevent="openDialog('text')">
+    <v-list-tile @click.stop="openDialog('text')">
       <v-list-tile-action><v-icon>fal fa-file-alt</v-icon></v-list-tile-action>
       <v-list-tile-title>New Text File</v-list-tile-title>
     </v-list-tile>
     <v-divider></v-divider>
-    <v-list-tile to="#" @click.prevent="openDialog('directory')">
+    <v-list-tile @click.stop="openDialog('directory')">
       <v-list-tile-action><v-icon>fal fa-folder-plus</v-icon></v-list-tile-action>
       <v-list-tile-title>New Folder</v-list-tile-title>
     </v-list-tile>
     <v-divider></v-divider>
-    <v-list-tile to="#" @click.prevent="openDialog('upload')">
+    <v-list-tile @click.stop="openDialog('upload')">
       <v-list-tile-action><v-icon>fal fa-cloud-upload</v-icon></v-list-tile-action>
       <v-list-tile-title>Upload File</v-list-tile-title>
     </v-list-tile>
