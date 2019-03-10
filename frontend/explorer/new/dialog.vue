@@ -11,6 +11,9 @@
           {{type === 'upload' ? 'Upload' : 'Create'}} a {{fileRef}} at
           <code>/{{currParent.path}}</code>
           <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="create()">
+            <span class="error--text" v-if="!fileValid">
+              File given exceeds the upload limit of 100Mb
+            </span>
             <file-upload
               v-if="type === 'upload'"
               v-model="uploadName"
@@ -50,7 +53,7 @@
             flat="flat"
             @click.stop="create()"
             :loading="isOperationPending"
-            :disabled="!valid || isOperationPending"
+            :disabled="!valid || !fileValid || isOperationPending"
           >
             Create
           </v-btn>
@@ -100,7 +103,7 @@ export default {
       uploadName: '',
       filename: '',
       filenameRules: [
-        v => /^[\w-. ]+$/.test(v) || 'Invalid file name charaters.',
+        v => /^[^\\/:*"<>|]+$/.test(v) || 'Invalid file name charaters.',
         (v) => {
           let filename = v;
           if (suffix && !RegExp(`${suffix.replace('.', '\\.')}$`).test(filename)) {
@@ -130,11 +133,11 @@ export default {
       const perms = (this.currParent.perms || []).filter(p => p !== 'superadmin.content.deleteroots');
       try {
         await this.$content.createFile(name, (this.currParent || {})._id, content, type, perms);
+        this.$emit('update:dialog', false);
       } catch (err) {
         this.error = `An error occured creating the new ${this.fileRef}, please contact an administrator.`;
-        return console.error(err); // eslint-disable-line no-console, consistent-return
+        return console.error([err]); // eslint-disable-line no-console, consistent-return
       }
-      this.$emit('update:dialog', false);
     },
   },
   computed: {
@@ -160,6 +163,10 @@ export default {
       return suffix;
     },
     fileRef() { return this.type === 'directory' ? 'folder' : 'file'; },
+    fileValid() {
+      if (this.type !== 'upload' || !this.file) return true;
+      return this.file.size <= 104857600;
+    },
   },
   watch: {
     dialog() { this.$emit('update:dialog', this.dialog); },
