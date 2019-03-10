@@ -13,7 +13,8 @@
         <v-text-field
           class="content-search"
           v-model="search"
-          append-icon="far fa-search"
+          prepend-icon="far fa-search"
+          clearable
         />
       </v-flex>
     </v-toolbar>
@@ -147,7 +148,7 @@ export default {
     if (!this.currentContent) return;
     let curr = this.currentContent;
     const open = ['', curr._id];
-    while (curr.parent) {
+    while (curr && curr.parent) {
       open.push(curr.parent);
       curr = this.getCont(curr.parent);
     }
@@ -169,7 +170,7 @@ export default {
 
 .content-search {
   width: min-content;
-  min-width: 100px;
+  min-width: 150px;
 }
 </style>
 

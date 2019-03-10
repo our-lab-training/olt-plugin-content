@@ -35,7 +35,7 @@ const isFile = (path, parent = '', groupId) => {
   return contents.length ? contents[0]._id : null;
 }; */
 
-const loadPath = (to, from, next) => {
+const loadPath = async (to, from, next) => {
   const group = store.getters['groups/current'];
   // console.log(to, store.getters['content/find']());
   const { path } = to.params;
@@ -44,15 +44,15 @@ const loadPath = (to, from, next) => {
   router.contPush = p => router.push(gPath.replace(':path*', p));
   let pathId = null;
   if (!path) {
-    const contents = store.getters['content/find']({
+    const contents = await store._actions['content/find'][0]({
       query: {
         name: '.directory',
         groupId: group._id,
         parent: { $exists: false },
       },
-    }).data;
+    });
     if (contents.length) pathId = contents[0]._id;
-  } else pathId = store.getters['content/get'](path);
+  } else pathId = await store._actions['content/get'][0](path);
   if (!pathId) return next(gPath.replace(':path*', '') || '/');
   store.commit('content/setCurrent', pathId);
   return next();

@@ -17,7 +17,7 @@ export default {
     return {};
   },
   computed: {
-    displayData() { return this.content ? supportedFiles[this.content.type] : {}; },
+    displayData() { return this.content ? supportedFiles[this.content.type] || {} : {}; },
   },
 };
 </script>
