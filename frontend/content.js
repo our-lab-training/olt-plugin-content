@@ -197,6 +197,7 @@ const contentLib = {
     return { content, file, type };
   },
   async writeFile(name, parent, payload) {
+    if (typeof name !== 'string' && !payload) payload = parent;
     store.commit('content/setOperationPending');
     let content = await this._findFile(name, parent);
     content = await this._getPresign(content, 'write');
