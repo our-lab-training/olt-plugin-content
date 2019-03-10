@@ -11,7 +11,7 @@ export default {
       name: 'Content',
       entry: true,
       component: explore,
-      path: '/group/{groupId}/content/:path*',
+      path: '/org/{groupId}/content/:path*',
       icon: 'fal fa-folder-open',
       visiblePerms: [
         '{groupId}.content.read',
