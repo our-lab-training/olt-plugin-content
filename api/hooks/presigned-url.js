@@ -40,7 +40,7 @@ module.exports = function (options = {}) {
           },
           Conditions: [
             { 'key': key },
-            ['content-length-range', 0, 1048576],
+            ['content-length-range', 0, 104857600],
           ],
           Expires: expiry,
         }, (err, data) => {
