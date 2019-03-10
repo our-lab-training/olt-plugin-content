@@ -13,7 +13,7 @@ module.exports = function (app) {
     name: {
       type: String,
       unique: false,
-      match: [/^[a-zA-Z0-9-_.~ ]+$/, 'Invalid charaters used in filename.'],
+      match: [/^[^\\/:*"<>|]+$/, 'Invalid charaters used in filename.'],
       required: [true, 'A file name is required'],
     },
     parent: ObjectIdType('content', app, false),
