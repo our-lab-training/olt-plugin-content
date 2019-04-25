@@ -1,5 +1,11 @@
 <template>
-  <component v-if="displayData.view" :is="displayData.view" :opts="displayData.opts || {}" />
+  <component
+    v-if="displayData.view"
+    :is="displayData.view"
+    :opts="displayData.opts || {}"
+    :show-hidden="showHidden"
+    @update:show-hidden="$emit('update:show-hidden', $event)"
+  />
 </template>
 
 <script>
@@ -11,6 +17,7 @@ import markdown from './view/markdown.vue';
 import download from './view/download.vue';
 import imageView from './view/image.vue';
 import msdocView from './view/msdoc.vue';
+import linkView from './view/link.vue';
 
 let disData;
 
@@ -22,6 +29,13 @@ export default {
     download,
     imageView,
     msdocView,
+    linkView,
+  },
+  props: {
+    showHidden: {
+      type: Boolean,
+      default: localStorage.showHiddenContent === 'true',
+    },
   },
   data() {
     return {};

@@ -95,7 +95,7 @@ const contentLib = {
     const filename = content.key.split('/').pop();// name.split('/').pop();
     let file = null;
     if (typeof payload === 'string') {
-      if (/^((data:)|(https{0,1}:\/\/)|(s{0,1}ftp:\/\/))/.test(payload)) {
+      if (/^((data:)|(https{0,1}:\/\/)|(s{0,1}ftp:\/\/))/.test(payload) && type !== 'text/uri-list') {
         payload = await this._url2File(payload, filename, type);
       } else payload = new Blob([payload], { type });
     }

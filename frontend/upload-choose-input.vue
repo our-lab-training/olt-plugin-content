@@ -6,6 +6,9 @@
     <v-tab>
       <v-icon left>fal fa-folder-open</v-icon> Existing Content
     </v-tab>
+    <v-tab>
+      <v-icon left>fal fa-external-link-square</v-icon> External Link
+    </v-tab>
     <v-tab-item>
       <v-layout row wrap justify-center style="padding-top:1em;">
         <file-upload @input="filename = $event" @formData="file = $event[0]"/>
@@ -22,6 +25,20 @@
     </v-tab-item>
     <v-tab-item>
       <tree input-mode :value="value" @input="active = $event" />
+    </v-tab-item>
+    <v-tab-item>
+      <v-text-field
+        label="Link Name"
+        :value="filename.replace('.uri', '')"
+        @input="filename = `${$event}.uri`"
+      />
+      <v-text-field
+        :label="`Link to File/Resource`"
+        placeholder="https://www.example.com/important-doc-v3.pdf"
+        v-model="link"
+        type="url"
+        required
+      />
     </v-tab-item>
   </v-tabs>
 </template>
@@ -55,6 +72,7 @@ export default {
       tab: this.value ? 1 : 0,
       filename: '',
       file: null,
+      link: '',
     };
   },
   computed: {
@@ -69,16 +87,22 @@ export default {
       if (parts.length < 2) return '';
       return `.${parts.pop()}`;
     },
-    valid() { return this.tab ? !!this.existing : (!!this.file && getType(this.filename)); },
+    valid() {
+      if (this.tab === 0) return !!(!!this.file && getType(this.filename));
+      if (this.tab === 1) return !!this.existing;
+      if (this.tab === 2) return !!this.filename && !!this.link;
+      return false;
+    },
   },
   methods: {
     async saveFile() {
       if (!this.valid) return '';
       if (this.tab === 1) return this.existing;
+      if (this.tab === 2 && !/\.uri$/.test(this.filename)) this.filename += '.uri';
       const { content } = await this.$content.createFile(
         `${this.path}${this.filename}`,
         null,
-        this.file,
+        this.tab === 0 ? this.file : this.link,
         getType(this.filename),
         this.perms,
       );

@@ -45,7 +45,7 @@ module.exports = {
   'text/x-java-source': { name: 'Java File', icon: 'java', stack: true, ext: ['java', 'jav'], view: 'textView', edit: 'textEdit', opts: { lang: 'java' } },
   'application/java-archive': { name: 'Java JAR Archive', icon: 'cogs', stack: true, ext: ['jar'], view: 'download' },
   // misc
-  'text/uri-list': { name: 'Link', icon: 'external-link-square', ext: ['uni', 'uri'], view: 'link', edit: 'link' },
+  'text/uri-list': { name: 'Link', icon: 'external-link-square', ext: ['uri', 'uni'], view: 'linkView', edit: 'linkEdit', hideExt: true },
   'text/x-comment': { name: 'Comment', icon: 'comment-alt-lines', stack: true, ext: ['comment'], view: 'markdown', edit: 'markdown' },
   'text/x-directory': { name: 'Directory', icon: 'folder', ext: ['directory'], view: 'directory' },
 };

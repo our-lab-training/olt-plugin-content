@@ -1,10 +1,17 @@
 <template>
   <v-container fluid grid-list-md style="padding:0;"><v-layout>
     <v-flex class="md4 lg3" v-if="$vuetify.breakpoint.mdAndUp">
-      <tree />
+      <tree
+        :show-hidden="showHidden && hasPerm(`${currentGroup._id}.content.read-hidden`)"
+        @update:show-hidden="showHidden = $event"
+      />
     </v-flex>
     <v-flex class="xs12 md8 lg9">
-      <viewFile v-if="typeof $route.query.edit === 'undefined'" />
+      <viewFile
+        v-if="typeof $route.query.edit === 'undefined'"
+        :show-hidden="showHidden && hasPerm(`${currentGroup._id}.content.read-hidden`)"
+        @update:show-hidden="showHidden = $event"
+      />
       <editFile v-else />
     </v-flex>
   </v-layout></v-container>
@@ -65,11 +72,14 @@ export default {
     editFile,
   },
   data() {
-    return {};
+    return {
+      showHidden: `${localStorage.showHiddenContent}` === 'true',
+    };
   },
   computed: {
     ...mapGetters('groups', { currentGroup: 'current' }),
     ...mapGetters('content', { currentContent: 'current' }),
+    ...mapGetters('users', { hasPerm: 'hasPerm' }),
   },
   beforeRouteEnter: async (to, from, next) => {
     loadPath(to, from, next);
@@ -78,5 +88,8 @@ export default {
     loadPath(to, from, next);
   },
   beforeRouteLeave: (to, from, next) => { store.commit('content/clearCurrent'); next(); },
+  watch: {
+    showHidden(v) { localStorage.showHiddenContent = v; },
+  },
 };
 </script>

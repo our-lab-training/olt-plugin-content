@@ -18,6 +18,10 @@
       <v-list-tile-action><v-icon>fal fa-cloud-upload</v-icon></v-list-tile-action>
       <v-list-tile-title>Upload File</v-list-tile-title>
     </v-list-tile>
+    <v-list-tile @click.stop="openDialog('link')">
+      <v-list-tile-action><v-icon>fal fa-external-link</v-icon></v-list-tile-action>
+      <v-list-tile-title>External File Link</v-list-tile-title>
+    </v-list-tile>
     <new-dialog :dialog.sync="dialog" :type="type" :parent="parent"/>
   </v-list>
 </template>

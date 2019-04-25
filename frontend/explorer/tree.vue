@@ -1,7 +1,7 @@
 <template>
   <v-card
     v-shortkey.once.push="['ctrl']"
-    @shortkey="multiple = !multiple"
+    @shortkey="selectMultiple = !selectMultiple"
     style="overflow-x: auto;"
   >
     <v-toolbar dense>
@@ -26,9 +26,8 @@
         :active.sync="active"
         activatable
         hoverable
-        :multiple-active="multiple"
+        :multiple-active="selectMultiple"
         item-key="key"
-        open-on-click
       >
         <template slot="prepend" slot-scope="{ item, open, leaf, active }">
           <v-icon
@@ -63,12 +62,17 @@ export default {
       type: String,
       default: () => undefined,
     },
+    showHidden: {
+      type: Boolean,
+      default: localStorage.showHiddenContent === 'true',
+    },
   },
   components: {
     fileIcon,
   },
   data() {
     return {
+      selectMultiple: this.multiple,
       open: [''],
       tree: [],
       active: [],
@@ -94,7 +98,6 @@ export default {
         : this.getCurrentContent
       ) || this.root;
     },
-    showHidden() { return typeof this.$route.query.showHidden !== 'undefined'; },
     items() {
       const searchResults = [];
       if (!this.root) return [{ name: 'Corrupt content configuration!' }];
@@ -105,7 +108,9 @@ export default {
         return res.reduce((a, cont) => {
           if (cont._id === parent) return a;
           const child = {
-            name: cont.filename,
+            name: supportedFiles[cont.type].hideExt
+              ? cont.filename.replace(/\.[\w-]+$/, '')
+              : cont.filename,
             type: cont.type,
           };
           if (/^\./.test(child.name) && !this.showHidden) return a;
@@ -136,13 +141,15 @@ export default {
   watch: {
     active() {
       if (
-        this.multiple
+        this.selectMultiple
         || this.active.length !== 1
         || this.active[0] === this.currentContent._id
       ) return;
       if (this.inputMode) this.$emit('input', this.active[0]);
       else this.$router.contPush(this.active[0]);
+      if (this.open.indexOf(this.active[0]) === -1) this.open.push(this.active[0]);
     },
+    multiple(v) { this.selectMultiple = v; },
   },
   mounted() {
     if (!this.currentContent) return;
@@ -153,7 +160,7 @@ export default {
       curr = this.getCont(curr.parent);
     }
     this.open = open;
-    if (this.currentContent.type === 'text/x-directory') return;
+    // if (this.currentContent.type === 'text/x-directory') return;
     this.active = [this.currentContent._id];
   },
 };

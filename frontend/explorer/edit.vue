@@ -7,6 +7,7 @@ import { mapGetters, mapState } from 'vuex';
 import supportedFiles from '../../supportedFiles';
 import markdown from './edit/markdown.vue';
 import textEdit from './edit/text.vue';
+import linkEdit from './edit/link.vue';
 
 let disData;
 
@@ -14,6 +15,7 @@ export default {
   components: {
     markdown,
     textEdit,
+    linkEdit,
   },
   data() {
     return {};

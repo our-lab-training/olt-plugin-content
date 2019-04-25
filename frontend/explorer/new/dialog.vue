@@ -2,7 +2,7 @@
   <v-dialog
       :value="dialog"
       @input="$emit('update:dialog', $event);"
-      max-width="290"
+      max-width="390"
     >
       <v-card>
         <v-card-title class="headline">Create a new {{fileRef}}.</v-card-title>
@@ -26,12 +26,21 @@
               v-if="type !== 'upload' || file"
               :label="`Unique ${fileRef[0].toUpperCase()}${fileRef.slice(1)} Name`"
               :suffix="suffix"
-              :hint="(!suffix && fileRef !== 'folder')
+              :hint="(!suffix && fileRef === 'file')
                 ? 'You must add a file extension. e.g. `.txt`'
                 : ''
               "
               v-model="filename"
               :rules="filenameRules"
+              validate-on-blur
+              required
+            />
+            <v-text-field
+              v-if="type === 'link'"
+              :label="`Link to File/Resource`"
+              placeholder="https://www.example.com/important-doc-v3.pdf"
+              v-model="link"
+              type="url"
               validate-on-blur
               required
             />
@@ -102,6 +111,7 @@ export default {
       file: null,
       uploadName: '',
       filename: '',
+      link: '',
       filenameRules: [
         v => /^[^\\/:*"<>|]+$/.test(v) || 'Invalid file name charaters.',
         (v) => {
@@ -109,7 +119,7 @@ export default {
           if (suffix && !RegExp(`${suffix.replace('.', '\\.')}$`).test(filename)) {
             filename += suffix;
           }
-          if (currentType !== 'directory' && !getType(filename)) return 'Invalid file extension.';
+          if (currentType === 'file' && !getType(filename)) return 'Invalid file extension.';
           const name = filename;
           return !store.getters['content/find']({ query: { name } }).data.length || 'This file name is already taken.';
         },
@@ -122,9 +132,13 @@ export default {
       this.error = '';
       if (!this.$refs.form.validate()) return;
       let content = '';
+      let { filename } = this;
       if (this.type === 'markdown') content += `# ${capitalize(this.filename.split('.').shift())}`;
       if (this.type === 'upload') content = this.file;
-      let { filename } = this;
+      if (this.type === 'link') {
+        content = this.link;
+        if (!/\.uri$/.test(filename)) filename += '.uri';
+      }
       if (this.suffix && !RegExp(`${this.suffix.replace('.', '\\.')}$`).test(filename)) {
         filename += this.suffix;
       }
@@ -162,7 +176,11 @@ export default {
       }
       return suffix;
     },
-    fileRef() { return this.type === 'directory' ? 'folder' : 'file'; },
+    fileRef() {
+      if (this.type === 'directory') return 'folder';
+      if (this.type === 'link') return 'link';
+      return 'file';
+    },
     fileValid() {
       if (this.type !== 'upload' || !this.file) return true;
       return this.file.size <= 104857600;
