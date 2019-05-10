@@ -18,6 +18,7 @@ import download from './view/download.vue';
 import imageView from './view/image.vue';
 import msdocView from './view/msdoc.vue';
 import linkView from './view/link.vue';
+import videoView from './view/video.vue';
 
 let disData;
 
@@ -30,6 +31,7 @@ export default {
     imageView,
     msdocView,
     linkView,
+    videoView,
   },
   props: {
     showHidden: {

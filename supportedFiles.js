@@ -6,9 +6,11 @@ module.exports = {
   'image/gif': { name: 'GIF Image', icon: 'file-image', ext: ['gif'], view: 'imageView' },
   'image/svg+xml': { name: 'SVG Image', icon: 'file-image', ext: ['svg'], view: 'imageView', edit: 'textEdit', opts: { lang: 'xml' } },
   // video files
-  'video/mp4': { name: 'MP4 Video', icon: 'file-video', ext: ['mp4', 'mpeg4'], view: 'video' },
-  'video/x-flv': { name: 'FLV Video', icon: 'file-video', ext: ['flv'], view: 'video' },
-  'video/x-motion-jpeg': { name: 'Motion JPEG Video', icon: 'file-video', ext: ['mjpg'], view: 'video' },
+  'video/mp4': { name: 'MP4 Video', icon: 'file-video', ext: ['mp4', 'mpeg4'], view: 'videoView' },
+  'video/x-flv': { name: 'FLV Video', icon: 'file-video', ext: ['flv'], view: 'videoView' },
+  'video/ogg': { name: 'OGG Video', icon: 'file-video', ext: ['ogg'], view: 'videoView' },
+  'video/webm': { name: 'WebM Video', icon: 'file-video', ext: ['webm'], view: 'videoView' },
+  'video/x-motion-jpeg': { name: 'Motion JPEG Video', icon: 'file-video', ext: ['mjpg'], view: 'videoView' },
   // audio
   'audio/mpeg3': { name: 'MP3 Audio', icon: 'file-audio', ext: ['mp3', 'mpeg3'], view: 'audio' },
   'audio/x-wav': { name: 'WAV Audio', icon: 'file-audio', ext: ['wav'], view: 'audio' },

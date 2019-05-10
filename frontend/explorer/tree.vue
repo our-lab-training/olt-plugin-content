@@ -6,7 +6,7 @@
   >
     <v-toolbar dense>
       <v-toolbar-title class="text-capitalize">
-        {{!inputMode ? $route.name : 'Select A File'}}
+        {{inputMode ? 'Select A File' : ''}}
       </v-toolbar-title>
       <v-spacer />
       <v-flex shrink>
