@@ -1,6 +1,20 @@
 <template>
   <v-container fluid grid-list-md style="padding:0;"><v-layout>
     <v-flex class="md4 lg3" v-if="$vuetify.breakpoint.mdAndUp">
+      <v-card>
+        <v-toolbar dense>
+          <v-toolbar-title>
+            Content
+          </v-toolbar-title>
+        </v-toolbar>
+        <v-card-text>
+          <p>
+            This is a place where documents are stored for the organisation.
+            You can click on a file to to open a view it.
+          </p>
+        </v-card-text>
+      </v-card>
+      &nbsp;
       <tree
         :show-hidden="showHidden && hasPerm(`${currentGroup._id}.content.read-hidden`)"
         @update:show-hidden="showHidden = $event"
