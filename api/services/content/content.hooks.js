@@ -4,27 +4,37 @@ const presignedUrl = require('../../hooks/presigned-url');
 const checkCopy = require('../../hooks/check-copy');
 const disable = require('../../hooks/disable-suffix');
 const safeRemove = require('../../../../../hooks/safe-remove');
+const filterByGroup = require('../../../../../hooks/filter-by-group');
+const restrictMethod = require('../../../../../hooks/restrict-method');
 
 const setenv = rec => {rec.bucket = process.env.AWS_BUCKET_PRIVATE; rec.region = process.env.AWS_REGION;};
 
 module.exports = {
   before: {
     all: [authenticate('jwt')],
-    find: [],
-    get: [],
+    find: [
+      filterByGroup({ override: 'superadmin.groups.read' }),
+    ],
+    get: [
+      filterByGroup({ override: 'superadmin.groups.read' }),
+    ],
     create: [
+      restrictMethod('{data.groupId}.enrolled'),
       iff(isProvider('external'), discard('md5')),
       alterItems(setenv),
     ],
     update: [
+      restrictMethod('{existing.groupId}.enrolled'),
       iff(isProvider('external'), discard('groupId')),
       alterItems(setenv),
     ],
     patch: [
+      restrictMethod('{existing.groupId}.enrolled'),
       iff(isProvider('external'), discard('groupId')),
       alterItems(setenv),
     ],
     remove: [
+      restrictMethod('{existing.groupId}.enrolled'),
       disable(),
       safeRemove(),
     ]
