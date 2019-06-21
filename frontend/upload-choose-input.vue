@@ -1,15 +1,16 @@
 <template>
   <v-tabs fixed-tabs v-model="tab">
-    <v-tab>
-      <v-icon left>fal fa-upload</v-icon> Upload New
+    <v-tab :style="{minWidth: 'initial'}">
+      <v-icon left>fal fa-upload</v-icon> Upload
     </v-tab>
-    <v-tab>
-      <v-icon left>fal fa-folder-open</v-icon> Existing Content
+    <v-tab :style="{minWidth: 'initial'}">
+      <v-icon left>fal fa-folder-open</v-icon> Existing
     </v-tab>
-    <v-tab>
-      <v-icon left>fal fa-external-link-square</v-icon> External Link
+    <v-tab :style="{minWidth: 'initial'}">
+      <v-icon left>fal fa-external-link-square</v-icon> Link
     </v-tab>
     <v-tab-item>
+      <v-divider/>
       <v-layout row wrap justify-center style="padding-top:1em;">
         <file-upload @input="filename = $event" @formData="file = $event[0]"/>
         <v-flex xs12>
@@ -27,6 +28,7 @@
       <tree input-mode :value="value" @input="active = $event" />
     </v-tab-item>
     <v-tab-item>
+      <v-divider/>
       <v-text-field
         label="Link Name"
         :value="filename.replace('.uri', '')"
