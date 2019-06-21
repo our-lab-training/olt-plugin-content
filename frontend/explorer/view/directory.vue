@@ -11,10 +11,10 @@
               @click="$router.contPush(props.item.to)"
               v-if="props.item.to != $route.params.path"
             >
-              {{ props.item.text.replace(/\b\w/g, l => l.toUpperCase()) }}
+              <pretty-name :ugly-name="props.item.text" caps/>
             </a>
             <span v-else>
-              {{ props.item.text.replace(/\b\w/g, l => l.toUpperCase()) }}
+              <pretty-name :ugly-name="props.item.text" caps/>
             </span>
           </template>
         </v-breadcrumbs>
@@ -71,9 +71,7 @@
                     :custStyle="{'margin-right': '0!important'}"
                   />
                   <br>
-                  <span>
-                    {{subdir.filename}}
-                  </span>
+                  <pretty-name :ugly-name="subdir.filename"/>
                 </v-card-text>
               </v-card>
             </v-badge>
@@ -161,7 +159,11 @@
           <v-list-tile-title>Edit</v-list-tile-title>
         </v-list-tile>
         <v-list-tile
-          v-if="hasPerm(`${currentGroup._id}.content.write`)"
+          v-if="
+            hasPerm(`${currentGroup._id}.content.write`)
+            && menu.context
+            && !/^[0-9abcdef]{24}$/.test(menu.context.name)
+          "
           @click="renameMenu = menu.context; menu.show=false;"
         >
           <v-list-tile-action><v-icon>far fa-i-cursor</v-icon></v-list-tile-action>
@@ -249,12 +251,14 @@ import fileIcon from '../fileIcon.vue';
 import newButton from '../new/button.vue';
 import backBtn from '../back.vue';
 import supportedFiles from '../../../supportedFiles';
+import prettyName from '../prettyName.vue';
 
 export default {
   components: {
     fileIcon,
     newButton,
     backBtn,
+    prettyName,
     reportError,
   },
   props: {

@@ -38,6 +38,9 @@
           </v-icon>
           <file-icon v-else :content="{ type: item.type }" custStyle="font-size: 1.6em;"/>
         </template>
+        <template slot="label" slot-scope="{ item, open, leaf, active }">
+          <pretty-name :ugly-name="item.name"/>
+        </template>
       </v-treeview>
     </v-card-text>
   </v-card>
@@ -47,6 +50,7 @@
 import { mapGetters } from 'vuex';
 import supportedFiles from '../../supportedFiles';
 import fileIcon from './fileIcon.vue';
+import prettyName from './prettyName.vue';
 
 export default {
   props: {
@@ -69,6 +73,7 @@ export default {
   },
   components: {
     fileIcon,
+    prettyName,
   },
   data() {
     return {
