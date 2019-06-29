@@ -25,7 +25,7 @@ export default {
   methods: {
     async prettyName(name) {
       if (!/^[0-9abcdef]{24}$/.test(name)) return name;
-      const getKeys = Object.keys(store._actions).filter(k => /^(inductions|binders|quizzes)\/get$/.test(k));
+      const getKeys = Object.keys(store._actions).filter(k => /^(inductions|binders|quizzes|trainings)\/get$/.test(k));
       const tryGet = async (i) => {
         if (i >= getKeys.length) return null;
         try {
