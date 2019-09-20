@@ -10,6 +10,9 @@
         >{{current.filename.replace(/\.[\w-]+$/, '')}}</span>.{{ext}}
       </v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn v-if="!hidden" flat icon @click="refresh()" :loading="refreshing">
+        <v-icon>fal fa-sync</v-icon>
+      </v-btn>
       <v-flex shrink>
         <v-select
           v-if="ext !== 'pdf'"
@@ -70,6 +73,7 @@ export default {
     return {
       presign: null,
       render: 'MS Office',
+      refreshing: false,
     };
   },
   computed: {
@@ -78,7 +82,7 @@ export default {
     ext() { return this.current.filename.split('.').pop(); },
     path() { return this.$route.params.path; },
     url() {
-      if (!this.presign) return '';
+      if (!this.presign || this.refreshing) return '';
       if (this.ext === 'pdf') return this.presign.url;
       return this.render === 'Google Docs'
         ? `https://docs.google.com/gview?url=${this.presign.url.replace(/[&]/g, '%26')}&embedded=true`
@@ -101,6 +105,10 @@ export default {
           }, 200);
         }
       }, 100);
+    },
+    refresh() {
+      this.refreshing = true;
+      setTimeout(() => {this.refreshing = false;}, 500);
     },
   },
   mounted() {
